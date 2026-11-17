@@ -32,7 +32,10 @@ if uploaded_file:
     # 2. Data Problems: Check for Inactive holding stock
     inactive_skus = items[items['status'] == 'Inactive']['sku'].tolist()
     inactive_stock = stock[stock['sku'].isin(inactive_skus)].copy()
-    stock_cols = ['0-30', '31-60', '61-90', '91-180', '180+']
+    
+    # [FIX APPLIED HERE: Using exact lowercase Excel headers]
+    stock_cols = ['qty 0-30 days', 'qty 31-60 days', 'qty 61-90 days', 'qty 91-180 days', 'qty 180+ days']
+    
     for c in stock_cols: 
         inactive_stock[c] = pd.to_numeric(inactive_stock[c], errors='coerce').fillna(0)
     
@@ -66,8 +69,10 @@ if uploaded_file:
     master = pd.merge(final_items, agg_stock, on='sku', how='left').fillna(0)
     master = pd.merge(master, agg_sales, on='sku', how='left').fillna(0)
 
-    master['aged_stock'] = master['91-180'] + master['180+']
+    # [FIX APPLIED HERE: Using exact lowercase Excel headers]
+    master['aged_stock'] = master['qty 91-180 days'] + master['qty 180+ days']
     master['total_stock'] = master[stock_cols].sum(axis=1)
+    
     master['unit_cost'] = pd.to_numeric(master['unit_cost'], errors='coerce')
     master['master_pack'] = pd.to_numeric(master['master_pack'], errors='coerce')
     master['aged_value'] = master['aged_stock'] * master['unit_cost']
