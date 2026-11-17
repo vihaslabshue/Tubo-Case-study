@@ -1,7 +1,7 @@
-st.header("4. Export Master List")
+st.markdown("<h2 style='color: #1F4E78; border-bottom: 2px solid #1F4E78; padding-bottom: 10px;'>4. Export Master List</h2>", unsafe_allow_html=True)
     output = io.BytesIO()
     
-    # We must import openpyxl tools at the top of the file, or right here to be safe
+    # We must import openpyxl tools
     from openpyxl.styles import PatternFill, Font, Alignment, Border, Side
     from openpyxl.utils import get_column_letter
 
@@ -15,8 +15,8 @@ st.header("4. Export Master List")
         
         # Now, apply professional styling
         workbook = writer.book
-        header_fill = PatternFill(start_color="1F4E78", end_color="1F4E78", fill_type="solid") # Dark Executive Blue
-        header_font = Font(color="FFFFFF", bold=True) # White Bold Text
+        header_fill = PatternFill(start_color="1F4E78", end_color="1F4E78", fill_type="solid")
+        header_font = Font(color="FFFFFF", bold=True)
         border = Border(left=Side(style='thin', color='D9D9D9'),
                         right=Side(style='thin', color='D9D9D9'),
                         top=Side(style='thin', color='D9D9D9'),
@@ -24,8 +24,8 @@ st.header("4. Export Master List")
         
         for sheet_name in workbook.sheetnames:
             ws = workbook[sheet_name]
-            ws.freeze_panes = 'A2' # Freeze the top row
-            ws.auto_filter.ref = ws.dimensions # Enable drop-down filters
+            ws.freeze_panes = 'A2'
+            ws.auto_filter.ref = ws.dimensions
             
             for col_idx, col in enumerate(ws.columns, 1):
                 max_length = 0
@@ -33,7 +33,7 @@ st.header("4. Export Master List")
                 header_name = str(ws.cell(row=1, column=col_idx).value).lower()
                 
                 for row_idx, cell in enumerate(col, 1):
-                    cell.border = border # Apply light borders
+                    cell.border = border
                     
                     if row_idx == 1:
                         cell.fill = header_fill
@@ -41,7 +41,6 @@ st.header("4. Export Master List")
                         cell.alignment = Alignment(horizontal='center', vertical='center')
                         
                     elif cell.value is not None:
-                        # Format numbers based on column names
                         if isinstance(cell.value, (int, float)):
                             if 'value' in header_name or 'cost' in header_name:
                                 cell.number_format = '₹#,##0.00'
@@ -50,23 +49,13 @@ st.header("4. Export Master List")
                             else:
                                 cell.number_format = '#,##0'
                     
-                    # Track max width for auto-resizing
                     try:
                         if len(str(cell.value)) > max_length:
                             max_length = len(str(cell.value))
                     except:
                         pass
                 
-                # Apply column width with a safety cap
                 ws.column_dimensions[col_letter].width = min(max_length + 2, 35)
-
-                st.markdown("<h2 style='color: #1F4E78; border-bottom: 2px solid #1F4E78; padding-bottom: 10px;'>1. Executive Summary</h2>", unsafe_allow_html=True)
-# ... (some code) ...
-st.markdown("<h2 style='color: #1F4E78; border-bottom: 2px solid #1F4E78; padding-bottom: 10px;'>2. Top 10 Push Items by Aged Value</h2>", unsafe_allow_html=True)
-# ... (some code) ...
-st.markdown("<h2 style='color: #1F4E78; border-bottom: 2px solid #1F4E78; padding-bottom: 10px;'>3. Customer Targets for Sales (Mobile View)</h2>", unsafe_allow_html=True)
-# ... (some code) ...
-st.markdown("<h2 style='color: #1F4E78; border-bottom: 2px solid #1F4E78; padding-bottom: 10px;'>4. Export Master List</h2>", unsafe_allow_html=True)
 
     st.download_button(
         label="Download Professional Results to Excel", 
