@@ -16,13 +16,29 @@ if uploaded_file:
     sales = pd.read_excel(uploaded_file, sheet_name='Sales_Lines')
     customers = pd.read_excel(uploaded_file, sheet_name='Customers')
 
-    # Clean headers
+    # Clean headers (lowercase and strip spaces)
     for df in [items, stock, sales, customers]:
         df.columns = df.columns.str.strip().str.lower()
     
-    items.rename(columns={'active or inactive': 'status', 'master pack quantity': 'master_pack', 'unit cost': 'unit_cost', 'alternate item': 'alt_name', 'alternate flag': 'alt_flag'}, inplace=True)
-    if 'customer id' in customers.columns:
-        customers.rename(columns={'customer id': 'customer'}, inplace=True)
+    # [FIX APPLIED HERE: Exact column mapping for Kothari Excel file]
+    items.rename(columns={
+        'item name': 'name', 
+        'master pack qty': 'master_pack', 
+        'unit cost (rs)': 'unit_cost', 
+        'alternate item (name)': 'alt_name', 
+        'alternate flag': 'alt_flag'
+    }, inplace=True)
+    
+    sales.rename(columns={
+        'customerid': 'customer',
+        'qty': 'quantity',
+        'value (rs)': 'value'
+    }, inplace=True)
+    
+    customers.rename(columns={
+        'customerid': 'customer',
+        'customername': 'name'
+    }, inplace=True)
 
     # Clean strings of trailing spaces
     for df in [items, stock, sales, customers]:
@@ -33,7 +49,6 @@ if uploaded_file:
     inactive_skus = items[items['status'] == 'Inactive']['sku'].tolist()
     inactive_stock = stock[stock['sku'].isin(inactive_skus)].copy()
     
-    # [FIX APPLIED HERE: Using exact lowercase Excel headers]
     stock_cols = ['qty 0-30 days', 'qty 31-60 days', 'qty 61-90 days', 'qty 91-180 days', 'qty 180+ days']
     
     for c in stock_cols: 
@@ -69,7 +84,6 @@ if uploaded_file:
     master = pd.merge(final_items, agg_stock, on='sku', how='left').fillna(0)
     master = pd.merge(master, agg_sales, on='sku', how='left').fillna(0)
 
-    # [FIX APPLIED HERE: Using exact lowercase Excel headers]
     master['aged_stock'] = master['qty 91-180 days'] + master['qty 180+ days']
     master['total_stock'] = master[stock_cols].sum(axis=1)
     
