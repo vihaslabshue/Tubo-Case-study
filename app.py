@@ -18,7 +18,7 @@ st.markdown("<h2 style='color: #1F4E78; border-bottom: 2px solid #1F4E78; paddin
         header_fill = PatternFill(start_color="1F4E78", end_color="1F4E78", fill_type="solid")
         header_font = Font(color="FFFFFF", bold=True)
         border = Border(left=Side(style='thin', color='D9D9D9'),
-                        right=Side(style='thin', color='D9D9D9'),
+                        right=Side(style='thin', ssscolor='D9D9D9'),
                         top=Side(style='thin', color='D9D9D9'),
                         bottom=Side(style='thin', color='D9D9D9'))
         
